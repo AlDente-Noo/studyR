@@ -1,0 +1,29 @@
+---
+title: "lab2_1"
+output: html_document
+---
+1. Используйте файл ExpImp.RData
+Напишите функцию, которая создает именованный список, такой что
+ - именами элементов списка являются названия федеральных округов
+ - элементами списка являются векторы, которые содержат те субъекты федерации, которые принадлежат соответствующему федеральному округу.
+
+```load('data/ExpImp.RData')
+regions_list <- function(data) {
+  
+  all_territories <- data[, 'Регион']
+  indexes <- 1:length(all_territories)
+  
+  mask_counties <- grepl('федеральный округ', all_territories)
+  county_indexes <- indexes[mask_counties]
+  counties <- data[mask_counties, 'Регион']
+  regions <- vector(mode='list', length=length(county_indexes))
+  names(regions) <- counties
+  for (i in 1:length(regions)) {
+    lower_bound <- county_indexes[i]
+    if (i < length(regions)) upper_bound <- county_indexes[i+1] else upper_bound <- length(indexes) + 1
+    data[(lower_bound + 1):(upper_bound - 1), 'Регион']
+    regions[[i]] <- data[(lower_bound + 1):(upper_bound - 1), 'Регион']
+  }
+  return(regions)
+}
+```

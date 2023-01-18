@@ -1,0 +1,46 @@
+---
+title: "Lab1_2_report"
+output: html_document
+---
+Файл с данными lab1_e2.Rdata. Допустим, в рамках некоторого
+медицинского исследования
+тестировалась эффективность новой вакцины от вируса гриппа. Одной из целей исследования
+являлось изучить динамику температуры тела пациентов на протяжении недели после
+вакцинации.
+Пациенты должны были каждый день приходить на осмо
+тр, где у них измеряли температуру.
+Каждый из семи дней экспериментатор вносил в таблицу id пациента и его температуру. После
+окончания исследования выяснилось, что некоторые пациенты не смогли посетить все семь
+приемов. Кто - то после первого раза больше не приходил на обследование, кто - то пропустил
+некоторые дни и т.д.
+Для чистоты исследования врачам необходимо отобрать из всех пациентов только тех, кто
+посетили каждый из семи приемов.
+Все данные хранятся в следующем формате: в списке all_data сохранены се
+мь датафреймов, с
+двумя колонками:
+```load("D:GIT/studyR/data/lab1_e2.Rdata") 
+merge <- function(data) {
+  list_tables <- lapply(data, function(week_table) Reduce(c, list(week_table)))
+  do.call(rbind, list_tables)
+}
+
+get_id <- function(all_data) {
+  
+  merged_table <- merge(all_data)
+  
+  tmp<-data.frame(id=integer(), total_temp=double(), count=integer())
+  for (row in 1:nrow(merged_table)){
+    entry <- merged_table[row,]
+    if (nrow(tmp[which(tmp$id==entry$id),]) == 0){
+      tmp[nrow(tmp)+1,] <- c(entry$id, entry$temp, 1)
+    } else {
+      prev_val <- tmp[which(tmp$id==entry$id),]
+      tmp[which(tmp$id==entry$id),] <-c(prev_val$id, prev_val$total_temp + entry$temp, prev_val$count + 1) 
+    }
+  }
+  
+  full_week <- tmp[tmp$count==7,]
+  data.frame(id = full_week$id, mean_temp = full_week$total_temp / 7)
+}
+
+```

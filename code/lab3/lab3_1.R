@@ -1,0 +1,28 @@
+library(tidyr)
+library(ggplot2)
+library(dplyr)
+library(hrbrthemes)
+library(gridExtra)
+dataframe1 <- read.csv("D:/GIT/studyR/data/data1.txt", sep=" ", skip=1)
+rownames(dataframe1) <- dataframe1$X1
+dataframe1 <- subset(dataframe1, select=-c(X1))
+dataframe2 <- read.csv("D:/GIT/studyR/data/data2.csv", sep=',', header=FALSE)
+dataframe2 <- data.frame(t(dataframe2))
+names(dataframe2) <- dataframe2[1, ]
+dataframe2 <- dataframe2[-1, ]
+names(dataframe2)[1] = "Sample"
+dataframe <- merge(dataframe1,dataframe2,by="Sample") %>% select(-c(Sample))
+dataframe
+first <- dataframe %>% drop_na() %>% select(c(Height, MaturType, GrowthType)) %>% group_by(MaturType)
+second <- dataframe %>% drop_na() %>% select(c(Height, MaturType, GrowthType))
+hist(first$Height)
+hist(second$Height)
+graphic1 <-first %>%
+  ggplot( aes(x=Height, fill=MaturType)) +
+  geom_histogram( position = 'identity', binwidth=5, alpha=0.6) +
+  theme_ipsum() +
+  labs(fill="")
+graphic2 <- first %>%
+  ggplot(aes(x=Height, fill=MaturType)) +
+  geom_density(aes(Height))
+grid.arrange(graphic1, graphic2, nrow=2,top="Height value statistics for each MaturType")

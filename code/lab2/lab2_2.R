@@ -1,0 +1,19 @@
+load('D:GIT/studyR/data/ExpImp.RData')
+regions_list <- function(data) {
+  
+  all_territories <- data[, '????????????']
+  indexes <- 1:length(all_territories)
+  
+  mask_counties <- grepl('?????????????????????? ??????????', all_territories)
+  county_indexes <- indexes[mask_counties]
+  counties <- data[mask_counties, '????????????']
+  regions <- vector(mode='list', length=length(county_indexes))
+  names(regions) <- counties
+  for (i in 1:length(regions)) {
+    lower_bound <- county_indexes[i]
+    if (i < length(regions)) upper_bound <- county_indexes[i+1] else upper_bound <- length(indexes) + 1
+    data[(lower_bound + 1):(upper_bound - 1), '????????????']
+    regions[[i]] <- data[(lower_bound + 1):(upper_bound - 1), '????????????']
+  }
+  return(regions)
+}
